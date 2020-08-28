@@ -37,7 +37,7 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 		.disable().authorizeRequests().antMatchers("/").permitAll()
 		.antMatchers("/index").permitAll()
 		
-		.antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+		.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 		
 		/* redireciona o usuario dps que ele deslogar */
 		.anyRequest().authenticated().and().logout().logoutSuccessUrl("/index")
