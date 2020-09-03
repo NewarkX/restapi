@@ -25,24 +25,25 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
 	protected JWTLoginFilter(String url, AuthenticationManager authenticationManager) {
 		/* obrigamos a autenticar */
 		super(new AntPathRequestMatcher(url));
-		
+
 		/* gerenciador de autenticacao */
 		setAuthenticationManager(authenticationManager);
 	}
+
 	/* retorna o usuario ao processar a autenticacao */
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException, IOException, ServletException {
 		/* esta pegando o token para validar */
-		Usuario user = new ObjectMapper().readValue(request.getInputStream(),Usuario.class);
+		Usuario user = new ObjectMapper().readValue(request.getInputStream(), Usuario.class);
 		/* retorna o login senha e acesso */
-		return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(user.getLogin()	, user.getSenha())) ;
+		return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(user.getLogin(), user.getSenha()));
 	}
-	
-	
+
+
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-			Authentication authResult) throws IOException, ServletException {
+											Authentication authResult) throws IOException, ServletException {
 		new JWTTokenAutenticacaoService().addAuthentication(response, authResult.getName());
 	}
 }

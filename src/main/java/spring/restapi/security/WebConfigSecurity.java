@@ -21,45 +21,35 @@ import spring.restapi.service.ImplementacaoUserDetailsService;
 @Configuration
 @EnableWebSecurity
 public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
-	
+
 	@Autowired
 	private ImplementacaoUserDetailsService implementacaoUserDetailsService;
-	
-	
+
+
 	/* configuracao de requisicao http */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		
+
 		/* Ativando protecao contra usuarios que nao estao validados por token */
-		http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-		
-		/* Ativando a permissao para acesso a pagina inicial do sistema  */
-		.disable().authorizeRequests().antMatchers("/").permitAll()
-		.antMatchers("/index").permitAll()
-		
-		.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-		
-		/* redireciona o usuario dps que ele deslogar */
-		.anyRequest().authenticated().and().logout().logoutSuccessUrl("/index")
-		
-		/* mapeia url de logout e invalida o usuario */
-		.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-		
-		/* Filtra requisicoes de login para autenticacao */
-		.and()
-		.addFilterBefore(new JWTLoginFilter("/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)
-		
-		/* filtra demais requisicoes para verificar a presença do token jwt no header http */
-		
-		.addFilterBefore(new JWTApiAutenticacaoFilter(),UsernamePasswordAuthenticationFilter.class );
+		http.csrf()
+				.disable()
+				.cors()
+				.and()
+				.authorizeRequests()
+				.antMatchers(HttpMethod.POST, "/login").permitAll()
+				.anyRequest().authenticated()
+				.and().logout()
+				.and()
+				.addFilterBefore(new JWTLoginFilter("/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(new JWTApiAutenticacaoFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
-	
+
 	@Override
-		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-			/* service que ira consultar o usuario no banco de dados */
-			auth.userDetailsService(implementacaoUserDetailsService)
-			/* padrao de codificacao de senha */
-			.passwordEncoder(new BCryptPasswordEncoder());
-			
-		}
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		/* service que ira consultar o usuario no banco de dados */
+		auth.userDetailsService(implementacaoUserDetailsService)
+				/* padrao de codificacao de senha */
+				.passwordEncoder(new BCryptPasswordEncoder());
+
+	}
 }

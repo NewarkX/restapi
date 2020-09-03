@@ -24,81 +24,83 @@ public class JWTTokenAutenticacaoService {
 	private static final String SECRET = "*SenhaExtremamenteSecreta";
 	/* prefixo padrao de token */
 	private static final String TOKEN_PREFIX = "Bearer";
-	
+
 	private static final String HEADER_STRING = "Authorization";
-	
+
 	/* gerando token de autenticacao e adicionando ao cabeçalho e resposta http */
-	public void addAuthentication(HttpServletResponse response,String username) throws IOException{
+	public void addAuthentication(HttpServletResponse response, String username) throws IOException {
 		/* Montagem do token */
 		String JWT = Jwts.builder() /* chama o gerador de token */
-		.setSubject(username)	/* adiciona o usuario */
-		.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) /* tempo de expiracao */
-		.signWith(SignatureAlgorithm.HS512,SECRET).compact(); /* compactacao e algoritmo de geracao de senha */
+				.setSubject(username)    /* adiciona o usuario */
+				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) /* tempo de expiracao */
+				.signWith(SignatureAlgorithm.HS512, SECRET).compact(); /* compactacao e algoritmo de geracao de senha */
 		String token = TOKEN_PREFIX + " " + JWT; /* junta o prefixo com jwt */
-		
+
 		/* adiciona o cabecalho http */
 		response.addHeader(HEADER_STRING, token);
-		
+
+		System.out.println(token);
 
 		/* liberando resposta para portas diferentes que usam a api ou clientes web */
-		liberarCORS(response);
-		
-	
+//		liberarCORS(response);
+
+
 		/* escreve token como resposta no corpo do http */
-		response.getWriter().write("{\"Authorization\": \""+token+"\"}");
+		response.getWriter().write("{\"Authorization\": \"" + token + "\"}");
 	}
-	
+
 	/* retorna o usuario validado com token ou caso nao seja valido retorna null*/
-	public Authentication getAuthentication(HttpServletRequest request,HttpServletResponse response) throws IOException {
+	public Authentication getAuthentication(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		/* pega o token enviado no cabeçalho http */
 		String token = request.getHeader(HEADER_STRING);
 		try {
-			if(token != null) {	
-				
-				String tokenLimpo = token.replace(TOKEN_PREFIX,"").trim();
-				
+			if (token != null) {
+
+				String tokenLimpo = token.replace(TOKEN_PREFIX, "").trim();
+
 				/* faz a validacao do token do usuario na requisicao */
 				String user = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(tokenLimpo)
-					.getBody().getSubject(); 
-				if(user != null) {
+						.getBody().getSubject();
+				if (user != null) {
 					Usuario usuario = ApplicationContextLoad.getApplicationContext()
-						.getBean(UsuarioRepository.class).findUserByLogin(user);
-					
-					if(usuario != null) {
-						
-						if(tokenLimpo.equalsIgnoreCase(usuario.getToken())) {
+							.getBean(UsuarioRepository.class).findUserByLogin(user);
+
+					if (usuario != null) {
+
+//						if (tokenLimpo.equalsIgnoreCase(usuario.getToken())) {
 							return new UsernamePasswordAuthenticationToken
 									(usuario.getLogin(), usuario.getSenha(), usuario.getAuthorities());
-						}
+//						}
 					}
 				}
 			}
-		}catch (io.jsonwebtoken.ExpiredJwtException e) {
+		} catch (io.jsonwebtoken.ExpiredJwtException e) {
 			try {
 				response.getOutputStream().println("Seu token esta expirado,faca o login ou informe um novo token para autencitacao");
-			} catch (IOException e2) {}
-			
-		}	
-		
-		liberarCORS(response);		
-			return null; /* nao autorizado */
+			} catch (IOException e2) {
+			}
+
 		}
+
+		liberarCORS(response);
+		return null; /* nao autorizado */
+	}
 
 	private void liberarCORS(HttpServletResponse response) {
 		if (response.getHeader("Access-Control-Allow-Origin") == null) {
-			response.addHeader("Access-Control-Allow-Origin", "*");		
+			response.addHeader("Access-Control-Allow-Origin", "*");
 		}
-		
+
 		if (response.getHeader("Access-Control-Allow-Headers") == null) {
-			response.addHeader("Access-Control-Allow-Headers", "*");		
+			response.addHeader("Access-Control-Allow-Headers", "*");
 		}
-		
+
 		if (response.getHeader("Access-Control-Request-Headers") == null) {
-			response.addHeader("Access-Control-Request-Headers", "*");		
+			response.addHeader("Access-Control-Request-Headers", "*");
 		}
-		
+
 		if (response.getHeader("Access-Control-Allow-Methods") == null) {
-			response.addHeader("Access-Control-Allow-Methods", "*");		
+			response.addHeader("Access-Control-Allow-Methods", "*");
 		}
 	}
 }

@@ -10,27 +10,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @EnableCaching
 @SpringBootApplication
-public class CursoSpringRestapiApplication  extends SpringBootServletInitializer implements WebMvcConfigurer {
-	
+public class CursoSpringRestapiApplication extends SpringBootServletInitializer implements WebMvcConfigurer {
+
 	public static void main(String[] args) {
 		SpringApplication.run(CursoSpringRestapiApplication.class, args);
 		System.out.println(new BCryptPasswordEncoder().encode("123"));
 	}
-	
+
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-	  
-	    registry.addMapping("/usuario/**")
-	    .allowedMethods("*")
-	    .allowedOrigins("*");
-
-	    registry.addMapping("/profissao/**")
-	    .allowedMethods("*")
-	    .allowedOrigins("*");
-	  
-	    registry.addMapping("/recuperar/**")
-	    .allowedMethods("*")
-	    .allowedOrigins("*");
+		registry.addMapping("/**")
+				.allowedOrigins("*")
+				.allowCredentials(false)
+				.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
 	}
 
 }
