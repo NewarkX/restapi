@@ -45,6 +45,16 @@ public class IndexController {
 		return new ResponseEntity<List<Usuario>>(list,HttpStatus.OK);
 	}
 	
+	
+	@GetMapping(value="/usuarioPorNome/{nome}",produces = "application/json")
+	@CachePut("cacheusuarios")
+	public ResponseEntity<List<Usuario>> usuarioPorNome(@PathVariable("nome")String nome) throws InterruptedException{
+		List<Usuario> list = (List<Usuario>) ur.findUserByNome(nome);	
+		return new ResponseEntity<List<Usuario>>(list,HttpStatus.OK);
+	}
+	
+	
+	
 	@GetMapping(value = "/{id}",produces = "application/json")
 	@CacheEvict(value="cacheuser",allEntries = true)
 	@CachePut("cacheuser")
