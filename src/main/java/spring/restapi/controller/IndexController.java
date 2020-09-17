@@ -54,13 +54,23 @@ public class IndexController {
 	}
 	
 	
-	
+	/* para retornar so os dados do DTO
 	@GetMapping(value = "/{id}",produces = "application/json")
 	@CacheEvict(value="cacheuser",allEntries = true)
 	@CachePut("cacheuser")
 	public ResponseEntity<UsuarioDTO> listarid(@PathVariable (value="id") Long id) {
 		Optional<Usuario> usuario = ur.findById(id);
 		return new ResponseEntity<UsuarioDTO>(new UsuarioDTO(usuario.get()),HttpStatus.OK);
+	}
+	*/
+	
+	@GetMapping(value = "/{id}", produces = "application/json")
+	@CachePut("cacheuser")
+	public ResponseEntity init(@PathVariable (value = "id") Long id) {
+		
+		Optional usuario = ur.findById(id);
+		
+		return new ResponseEntity(usuario.get(), HttpStatus.OK);
 	}
 	
 	@PostMapping(value="/",produces = "application/json")
