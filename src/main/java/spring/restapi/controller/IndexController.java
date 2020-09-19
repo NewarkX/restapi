@@ -90,7 +90,7 @@ public class IndexController {
 			usuario.getTelefones().get(pos).setUsuario(usuario);
 		}
 		
-		Usuario userTemp = ur.findUserByLogin(usuario.getLogin());
+		Usuario userTemp = ur.findById(usuario.getId()).get();
 		
 		if(!userTemp.getSenha().equals(usuario.getSenha())) { //se as senhas dos usuarios forem diferentes criptografa
 			String senhacriptografada = new BCryptPasswordEncoder().encode(usuario.getSenha());

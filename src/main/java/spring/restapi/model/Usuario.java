@@ -1,6 +1,7 @@
 package spring.restapi.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class Usuario implements UserDetails {
 	referencedColumnName = "id" ,updatable = false,
 	table = "role",foreignKey = @ForeignKey(name = "role_fk",value = ConstraintMode.CONSTRAINT ))	
 	)
-	private List<Role> roles;
+	private List<Role> roles = new ArrayList<Role>();
 	
 	private String token = "";
 	
