@@ -75,8 +75,10 @@ public class IndexController {
 	
 	@PostMapping(value="/",produces = "application/json")
 	public ResponseEntity<Usuario> cadastrar(@RequestBody  Usuario usuario){
-		for(int pos = 0;pos < usuario.getTelefones().size();pos++) {
-			usuario.getTelefones().get(pos).setUsuario(usuario);
+		if (usuario.getTelefones() != null ){
+			for(int pos = 0;pos < usuario.getTelefones().size();pos++) {
+				usuario.getTelefones().get(pos).setUsuario(usuario);
+			}
 		}
 		String senhacriptografada = new BCryptPasswordEncoder().encode(usuario.getSenha());
 		usuario.setSenha(senhacriptografada);
