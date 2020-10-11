@@ -68,7 +68,7 @@ public class Usuario implements UserDetails {
 		return token;
 	}
 	
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 	public void setId(long id) {
