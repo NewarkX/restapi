@@ -19,6 +19,11 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Long>{
 	
 	@Transactional
 	@Modifying
+	@Query(nativeQuery = true,value="update usuario set token = ?1 where login = ?2")
+	void atualizaTokenUser(String token ,String login);
+	
+	@Transactional
+	@Modifying
 	@Query(nativeQuery = true,value = "insert into usuarios_role (usuario_id, role_id) values (?1, (select id from role where nome_role = 'ROLE_USER'));")
 	void insereAcessoRolePadrao(Long idUser);
 }

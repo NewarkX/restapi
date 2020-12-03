@@ -38,6 +38,9 @@ public class JWTTokenAutenticacaoService {
 
 		/* adiciona o cabecalho http */
 		response.addHeader(HEADER_STRING, token);
+		
+		ApplicationContextLoad.getApplicationContext()
+		.getBean(UsuarioRepository.class).atualizaTokenUser(JWT, username);
 
 		System.out.println(token);
 
