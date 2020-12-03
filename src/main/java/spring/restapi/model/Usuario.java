@@ -1,4 +1,4 @@
-package spring.restapi.model;
+	package spring.restapi.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.UniqueConstraint;
 
@@ -46,15 +47,29 @@ public class Usuario implements UserDetails {
 	@OneToMany(mappedBy = "usuario",orphanRemoval = true,cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private List<Telefone> telefones;
 	
-	@OneToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "usuarios_role",uniqueConstraints = @UniqueConstraint (
-		columnNames = {"usuario_id","role_id"}, name = "unique_role_user"),
-	joinColumns = @JoinColumn(name = "usuario_id",referencedColumnName = "id",table = "usuario",unique = false,
-	foreignKey = @ForeignKey (name = "usuario_fk",	
-	value = ConstraintMode.CONSTRAINT)),
-	inverseJoinColumns = @JoinColumn(name = "role_id",unique = false,
-	referencedColumnName = "id" ,updatable = false,
-	table = "role",foreignKey = @ForeignKey(name = "role_fk",value = ConstraintMode.CONSTRAINT ))	
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(
+			name = "usuarios_role",
+			uniqueConstraints = @UniqueConstraint ( // uniqueConstraints: Define a área de criação de constraints(dentro da anotação @Table), podendo ter uma ou mais;
+				columnNames = {"usuario_id","role_id"}, //columnNames: Define quais campos formaram a regra de unico, no exemplo é o atributo CNPJ, mas poderia ser 2 atributos e a sintaxe seria : columnNames = {“CNPJ”, “TIPOPESSOA”}. Obs: é o atributo da classe, não o nome do campo no banco de dados
+				name = "unique_role_user"), // name: O nome da UniqueConstraint no banco de dados.
+				joinColumns = @JoinColumn(
+					name = "usuario_id",
+					referencedColumnName = "id",
+					table = "usuario",
+					unique = false,
+					foreignKey = @ForeignKey (
+						name = "usuario_fk",	
+						value = ConstraintMode.CONSTRAINT)),
+				inverseJoinColumns = @JoinColumn(
+					name = "role_id",
+					unique = false,
+					referencedColumnName = "id" ,
+					updatable = false,
+					table = "role",
+					foreignKey = @ForeignKey(
+						name = "role_fk",
+						value = ConstraintMode.CONSTRAINT ))	
 	)
 	private List<Role> roles = new ArrayList<Role>();
 	

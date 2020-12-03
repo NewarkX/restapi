@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import spring.restapi.model.Usuario;
 import spring.restapi.model.UsuarioDTO;
 import spring.restapi.repository.UsuarioRepository;
+import spring.restapi.service.ImplementacaoUserDetailsService;
 
 @RestController
 @RequestMapping(value="/usuario")
@@ -33,6 +34,9 @@ public class IndexController {
 	
 	@Autowired
 	private UsuarioRepository ur;
+	
+	@Autowired
+	private ImplementacaoUserDetailsService implementacaoUserDetailsService;
 	
 	@GetMapping(value="/",produces = "application/json")
 	@CacheEvict(value="cacheusuarios",allEntries = true)
@@ -83,6 +87,7 @@ public class IndexController {
 		String senhacriptografada = new BCryptPasswordEncoder().encode(usuario.getSenha());
 		usuario.setSenha(senhacriptografada);
 		Usuario usuariosalvo = ur.save(usuario);
+		implementacaoUserDetailsService.insereAcessoPadrao(usuariosalvo.getId());
 		return new ResponseEntity<Usuario>(usuariosalvo,HttpStatus.OK);
 	}
 	
