@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import spring.restapi.model.Usuario;
 import spring.restapi.model.UsuarioDTO;
+import spring.restapi.repository.TelefoneRepository;
 import spring.restapi.repository.UsuarioRepository;
 import spring.restapi.service.ImplementacaoUserDetailsService;
 
@@ -37,6 +38,9 @@ public class IndexController {
 	
 	@Autowired
 	private ImplementacaoUserDetailsService implementacaoUserDetailsService;
+	
+	@Autowired
+	private TelefoneRepository telefonerepository;
 	
 	@GetMapping(value="/",produces = "application/json")
 	@CacheEvict(value="cacheusuarios",allEntries = true)
@@ -114,6 +118,11 @@ public class IndexController {
 		return "ok";
 	}
 	
+	@DeleteMapping(value="/removerTelefone/{id}",produces = "application/text")
+	public String deleteTelefone(@PathVariable("id") Long id) {
+			telefonerepository.deleteById(id);
+			return "ok"; 
+	}
 	
 	
 	/*//retornando json

@@ -140,6 +140,7 @@ public class Usuario implements UserDetails {
 	
 	/* sao os acessos do usuario */
 	@Override
+	@JsonIgnore
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return roles;
 	}
