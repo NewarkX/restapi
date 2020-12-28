@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 
 
 import spring.restapi.model.Usuario;
@@ -45,21 +47,92 @@ public class IndexController {
 	@GetMapping(value="/",produces = "application/json")
 	@CacheEvict(value="cacheusuarios",allEntries = true)
 	@CachePut("cacheusuarios")
-	public ResponseEntity<List<Usuario>> listar() throws InterruptedException{
-		List<Usuario> list = (List<Usuario>) ur.findAll();
+	public ResponseEntity<Page<Usuario>> listar() throws InterruptedException{
+		
+		PageRequest page = PageRequest.of(0,5, Sort.by("nome"));
+		Page<Usuario> list = ur.findAll(page);
+		
+		
+		return new ResponseEntity<Page<Usuario>>(list,HttpStatus.OK);
+		
+		//List<Usuario> list = (List<Usuario>) ur.findAll();
 		
 		//Thread.sleep(6000); // segura o codigo por 6 segundos simulando um processo lento
 		
-		return new ResponseEntity<List<Usuario>>(list,HttpStatus.OK);
+		//return new ResponseEntity<List<Usuario>>(list,HttpStatus.OK);
+		
+		
 	}
 	
-	
-	@GetMapping(value="/usuarioPorNome/{nome}",produces = "application/json")
+	@GetMapping(value="/page/{pagina}",produces = "application/json")
+	@CacheEvict(value="cacheusuarios",allEntries = true)
 	@CachePut("cacheusuarios")
-	public ResponseEntity<List<Usuario>> usuarioPorNome(@PathVariable("nome")String nome) throws InterruptedException{
-		List<Usuario> list = (List<Usuario>) ur.findUserByNome(nome);	
-		return new ResponseEntity<List<Usuario>>(list,HttpStatus.OK);
+	public ResponseEntity<Page<Usuario>> listarpagina(@PathVariable("pagina") int pagina ) throws InterruptedException{
+		
+		PageRequest page = PageRequest.of(pagina,5, Sort.by("nome"));
+		Page<Usuario> list = ur.findAll(page);
+		
+		
+		return new ResponseEntity<Page<Usuario>>(list,HttpStatus.OK);
+		
+		//List<Usuario> list = (List<Usuario>) ur.findAll();
+		
+		//Thread.sleep(6000); // segura o codigo por 6 segundos simulando um processo lento
+		
+		//return new ResponseEntity<List<Usuario>>(list,HttpStatus.OK);
+		
+		
 	}
+	
+	
+	
+	@GetMapping(value = "/usuarioPorNome/{nome}", produces = "application/json")
+	@CachePut("cacheusuarios")
+	public ResponseEntity<Page<Usuario>> usuarioPorNome (@PathVariable("nome") String nome) throws InterruptedException{
+		
+		
+		PageRequest pageRequest = null;
+		Page<Usuario> list = null;
+		
+		if (nome == null || (nome != null && nome.trim().isEmpty())
+				|| nome.equalsIgnoreCase("undefined")) {/*Não informou nome*/
+			
+			pageRequest = PageRequest.of(0, 5, Sort.by("nome"));
+			list =  ur.findAll(pageRequest);
+		}else {
+			pageRequest = PageRequest.of(0, 5, Sort.by("nome"));
+			list = ur.findUserByNamePage(nome, pageRequest);
+		}		
+				
+		
+		
+		return new ResponseEntity<Page<Usuario>>(list, HttpStatus.OK);
+	}
+	
+	
+	@GetMapping(value = "/usuarioPorNome/{nome}/page/{page}", produces = "application/json")
+	@CachePut("cacheusuarios")
+	public ResponseEntity<Page<Usuario>> usuarioPorNomePage (@PathVariable("nome") String nome,@PathVariable("page") int page) throws InterruptedException{
+		
+		
+		PageRequest pageRequest = null;
+		Page<Usuario> list = null;
+		
+		if (nome == null || (nome != null && nome.trim().isEmpty())
+				|| nome.equalsIgnoreCase("undefined")) {/*Não informou nome*/
+			
+			pageRequest = PageRequest.of(page, 5, Sort.by("nome"));
+			list =  ur.findAll(pageRequest);
+		}else {
+			pageRequest = PageRequest.of(page, 5, Sort.by("nome"));
+			list = ur.findUserByNamePage(nome, pageRequest);
+		}		
+				
+		
+		
+		return new ResponseEntity<Page<Usuario>>(list, HttpStatus.OK);
+	}
+	
 	
 	
 	/* para retornar so os dados do DTO
